@@ -1,14 +1,8 @@
 package org.wit.scorewriter.main
 
 import android.app.Application
-import org.wit.scorewriter.models.ScoreModel
+import org.wit.scorewriter.models.ScoreMemStore
 
 class MainApp : Application() {
-
-    val scores = ArrayList<ScoreModel>()
-
-    override fun onCreate() {
-        super.onCreate()
-        scores.add(ScoreModel("Giant Steps", "John Coltrane"))
-    }
+    val scores = ScoreMemStore()
 }

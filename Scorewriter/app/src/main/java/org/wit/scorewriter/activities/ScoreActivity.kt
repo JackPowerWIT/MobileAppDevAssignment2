@@ -12,6 +12,7 @@ import org.wit.scorewriter.models.ScoreModel
 class ScoreActivity : AppCompatActivity() {
 
     lateinit var app: MainApp
+    var score = ScoreModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -21,12 +22,27 @@ class ScoreActivity : AppCompatActivity() {
         setSupportActionBar(toolbar_score)
         // enable up button
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        var toUpdate = false
+
+        // check for score extra
+        if (intent.hasExtra(EXTRA_SCORE)){
+            score = intent.extras?.getParcelable<ScoreModel>(EXTRA_SCORE)!!
+            titleField.setText(score.title)
+            artistField.setText(score.artist)
+            toUpdate = true
+        }
 
         btnAdd.setOnClickListener(){
-            val title = titleField.text.toString()
-            val artist = artistField.text.toString()
-            if (title.isNotEmpty() && artist.isNotEmpty()){
-                app.scores.add(ScoreModel(title, artist))
+            score.title = titleField.text.toString()
+            score.artist = artistField.text.toString()
+            if (score.title.isNotEmpty() && score.artist.isNotEmpty()){
+                if (toUpdate){
+                    app.scores.update(score)
+                }
+                else {
+                    app.scores.create(score.copy())
+                }
+                setResult(AppCompatActivity.RESULT_OK)
                 finish()
             }
         }

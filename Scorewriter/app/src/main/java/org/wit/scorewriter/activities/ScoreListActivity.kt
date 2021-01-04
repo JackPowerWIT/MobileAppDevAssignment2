@@ -12,7 +12,9 @@ import org.wit.scorewriter.R
 import org.wit.scorewriter.main.MainApp
 import org.wit.scorewriter.models.ScoreModel
 
-class ScoreListActivity : AppCompatActivity() {
+const val EXTRA_SCORE = "org.wit.scorewriter.SCORE"
+
+class ScoreListActivity : AppCompatActivity(), ScoreItemListener {
 
     lateinit var app: MainApp
 
@@ -24,7 +26,7 @@ class ScoreListActivity : AppCompatActivity() {
 
         val layoutManager = LinearLayoutManager(this)
         recyclerView.layoutManager = layoutManager
-        recyclerView.adapter = ScoreListAdapter(app.scores)
+        recyclerView.adapter = ScoreListAdapter(app.scores.findAll(), this)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -41,9 +43,28 @@ class ScoreListActivity : AppCompatActivity() {
             super.onOptionsItemSelected(item)
         }
     }
+
+    override fun onScoreItemClick(score: ScoreModel) {
+        val intent = Intent(this, ScoreActivity::class.java).apply {
+            putExtra(EXTRA_SCORE, score)
+        }
+        startActivity(intent)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        recyclerView.adapter?.notifyDataSetChanged()
+        super.onActivityResult(requestCode, resultCode, data)
+    }
 }
 
-class ScoreListAdapter(private val scores: ArrayList<ScoreModel>) :
+interface ScoreItemListener {
+    fun onScoreItemClick(score: ScoreModel)
+}
+
+class ScoreListAdapter(
+        private val scores: List<ScoreModel>,
+        private val listener: ScoreItemListener
+) :
         RecyclerView.Adapter<ScoreListAdapter.MainHolder>()
 {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MainHolder {
@@ -54,16 +75,17 @@ class ScoreListAdapter(private val scores: ArrayList<ScoreModel>) :
     }
 
     override fun onBindViewHolder(holder: MainHolder, position: Int) {
-        holder.bind(scores[position])
+        holder.bind(scores[position], listener)
     }
 
     override fun getItemCount(): Int = scores.size
 
     class MainHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
     {
-        fun bind(score: ScoreModel) {
+        fun bind(score: ScoreModel, listener: ScoreItemListener) {
             itemView.scoreTitle.text = score.title
             itemView.scoreArtist.text = score.artist
+            itemView.setOnClickListener { listener.onScoreItemClick(score) }
         }
     }
 }
