@@ -9,21 +9,22 @@ import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.activity_score_list.*
 import kotlinx.android.synthetic.main.card_score.view.*
 import org.wit.scorewriter.R
+import org.wit.scorewriter.main.MainApp
 import org.wit.scorewriter.models.ScoreModel
 
 class ScoreListActivity : AppCompatActivity() {
 
-    val scores = ArrayList<ScoreModel>()
+    lateinit var app: MainApp
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_score_list)
+        app = application as MainApp
         setSupportActionBar(toolbar_main)
 
-        scores.add(ScoreModel("Giant Steps", "John Coltrane"))
         val layoutManager = LinearLayoutManager(this)
         recyclerView.layoutManager = layoutManager
-        recyclerView.adapter = ScoreListAdapter(scores)
+        recyclerView.adapter = ScoreListAdapter(app.scores)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
